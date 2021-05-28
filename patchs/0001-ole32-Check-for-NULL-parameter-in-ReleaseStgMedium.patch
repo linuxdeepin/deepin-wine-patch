@@ -1,0 +1,56 @@
+From 3956b5260302926c09f571df79b3431aca0c1479 Mon Sep 17 00:00:00 2001
+From: Chao Long <longchao@uniontech.com>
+Date: Mon, 28 Sep 2020 09:31:11 +0100
+Subject: [PATCH] ole32: Check for NULL parameter in ReleaseStgMedium().
+
+libcef can call ReleaseStgMedium( NULL )
+
+Signed-off-by: Chao Long <longchao@uniontech.com>
+Signed-off-by: Huw Davies <huw@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/ole32/ole2.c       | 2 ++
+ dlls/ole32/tests/ole2.c | 6 ++++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/dlls/ole32/ole2.c b/dlls/ole32/ole2.c
+index 15c4f8234f3..4464ba07144 100644
+--- a/dlls/ole32/ole2.c
++++ b/dlls/ole32/ole2.c
+@@ -2023,6 +2023,8 @@ found:
+ void WINAPI ReleaseStgMedium(
+   STGMEDIUM* pmedium)
+ {
++  if (!pmedium) return;
++
+   switch (pmedium->tymed)
+   {
+     case TYMED_HGLOBAL:
+diff --git a/dlls/ole32/tests/ole2.c b/dlls/ole32/tests/ole2.c
+index cd7eb839233..42e377f8a63 100644
+--- a/dlls/ole32/tests/ole2.c
++++ b/dlls/ole32/tests/ole2.c
+@@ -4610,6 +4610,11 @@ static void test_OleCreateStaticFromData(void)
+     IStorage_Release(storage);
+ }
+ 
++static void test_ReleaseStgMedium( void )
++{
++    ReleaseStgMedium( NULL );
++}
++
+ START_TEST(ole2)
+ {
+     DWORD dwRegister;
+@@ -4661,6 +4666,7 @@ START_TEST(ole2)
+     test_data_cache_save_data();
+     test_data_cache_contents();
+     test_OleCreateStaticFromData();
++    test_ReleaseStgMedium();
+ 
+     CoUninitialize();
+ }
+-- 
+2.20.1
+

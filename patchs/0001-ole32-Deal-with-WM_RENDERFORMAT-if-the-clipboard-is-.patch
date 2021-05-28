@@ -1,0 +1,29 @@
+From 065b56e4e1c0c67862345496cfb1a1df53f8ee95 Mon Sep 17 00:00:00 2001
+From: Zhipeng Zhao <zhaozhipeng@uniontech.com>
+Date: Tue, 9 Jun 2020 09:18:39 +0100
+Subject: [PATCH] ole32: Deal with WM_RENDERFORMAT if the clipboard is empty.
+
+Signed-off-by: Zhipeng Zhao <zhaozhipeng@uniontech.com>
+Signed-off-by: Huw Davies <huw@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/ole32/clipboard.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/dlls/ole32/clipboard.c b/dlls/ole32/clipboard.c
+index 9df37750a32..cb6770c05b3 100644
+--- a/dlls/ole32/clipboard.c
++++ b/dlls/ole32/clipboard.c
+@@ -2066,6 +2066,8 @@ static LRESULT CALLBACK clipbrd_wndproc(HWND hwnd, UINT message, WPARAM wparam,
+         ole_priv_data_entry *entry;
+ 
+         TRACE("(): WM_RENDERFORMAT(cfFormat=%x)\n", cf);
++
++        if (!clipbrd || !clipbrd->cached_enum) break;
+         entry = find_format_in_list(clipbrd->cached_enum->entries, clipbrd->cached_enum->count, cf);
+ 
+         if(entry)
+-- 
+2.20.1
+

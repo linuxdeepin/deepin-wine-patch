@@ -1,0 +1,76 @@
+From 3f06a09604f8c2364dfbf6e6987d991f140544bc Mon Sep 17 00:00:00 2001
+From: Wei Xie <xiewei@deepin.com>
+Date: Tue, 9 Jan 2018 12:06:25 +0100
+Subject: [PATCH] wininet/tests: Check null pointer in
+ InternetGetSecurityInfoByURLW.
+
+Signed-off-by: Wei xie <xiewei@linuxdeepin.com>
+Signed-off-by: Jacek Caban <jacek@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/wininet/internet.c   | 15 ++++++++-------
+ dlls/wininet/tests/http.c | 12 ++++++++++++
+ 2 files changed, 20 insertions(+), 7 deletions(-)
+
+diff --git a/dlls/wininet/internet.c b/dlls/wininet/internet.c
+index 1f1bbbd6d4c..699962c1b0e 100644
+--- a/dlls/wininet/internet.c
++++ b/dlls/wininet/internet.c
+@@ -4462,6 +4462,11 @@ BOOL WINAPI InternetGetSecurityInfoByURLW(LPCWSTR lpszURL, PCCERT_CHAIN_CONTEXT
+ 
+     TRACE("(%s %p %p)\n", debugstr_w(lpszURL), ppCertChain, pdwSecureFlags);
+ 
++    if (!ppCertChain && !pdwSecureFlags) {
++        SetLastError(ERROR_INVALID_PARAMETER);
++        return FALSE;
++    }
++
+     url.dwHostNameLength = 1;
+     res = InternetCrackUrlW(lpszURL, 0, 0, &url);
+     if(!res || url.nScheme != INTERNET_SCHEME_HTTPS) {
+@@ -4476,15 +4481,11 @@ BOOL WINAPI InternetGetSecurityInfoByURLW(LPCWSTR lpszURL, PCCERT_CHAIN_CONTEXT
+     }
+ 
+     if(server->cert_chain) {
+-        const CERT_CHAIN_CONTEXT *chain_dup;
+-
+-        chain_dup = CertDuplicateCertificateChain(server->cert_chain);
+-        if(chain_dup) {
+-            *ppCertChain = chain_dup;
++        if(pdwSecureFlags)
+             *pdwSecureFlags = server->security_flags & _SECURITY_ERROR_FLAGS_MASK;
+-        }else {
++
++        if(ppCertChain && !(*ppCertChain = CertDuplicateCertificateChain(server->cert_chain)))
+             res = FALSE;
+-        }
+     }else {
+         SetLastError(ERROR_INTERNET_ITEM_NOT_FOUND);
+         res = FALSE;
+diff --git a/dlls/wininet/tests/http.c b/dlls/wininet/tests/http.c
+index 1c2aadb5f54..af78704d68e 100644
+--- a/dlls/wininet/tests/http.c
++++ b/dlls/wininet/tests/http.c
+@@ -5593,6 +5593,18 @@ static void _test_security_info(unsigned line, const char *urlc, DWORD error, DW
+         ok_(__FILE__,line)(chain != NULL, "chain = NULL\n");
+         ok_(__FILE__,line)(flags == ex_flags, "flags = %x\n", flags);
+         CertFreeCertificateChain(chain);
++
++        SetLastError(0xdeadbeef);
++        res = pInternetGetSecurityInfoByURLA(url, NULL, NULL);
++        ok_(__FILE__,line)(!res && GetLastError() == ERROR_INVALID_PARAMETER,
++                           "InternetGetSecurityInfoByURLA returned: %x(%u)\n", res, GetLastError());
++
++        res = pInternetGetSecurityInfoByURLA(url, &chain, NULL);
++        ok_(__FILE__,line)(res, "InternetGetSecurityInfoByURLA failed: %u\n", GetLastError());
++        CertFreeCertificateChain(chain);
++
++        res = pInternetGetSecurityInfoByURLA(url, NULL, &flags);
++        ok_(__FILE__,line)(res, "InternetGetSecurityInfoByURLA failed: %u\n", GetLastError());
+     }else {
+         ok_(__FILE__,line)(!res && GetLastError() == error,
+                            "InternetGetSecurityInfoByURLA returned: %x(%u), expected %u\n", res, GetLastError(), error);
+-- 
+2.20.1
+

@@ -1,0 +1,30 @@
+From 48fb9d6a03a16e389b3d214d68356c52ad3310b9 Mon Sep 17 00:00:00 2001
+From: Wei xie <xiewei@linuxdeepin.com>
+Date: Tue, 27 Mar 2018 14:00:07 +0800
+Subject: [PATCH] winex11: Avoid deadlock when setting cursor.
+
+Signed-off-by: Wei xie <xiewei@linuxdeepin.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/winex11.drv/window.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/winex11.drv/window.c b/dlls/winex11.drv/window.c
+index 6d79f065498..fff3f5c7177 100644
+--- a/dlls/winex11.drv/window.c
++++ b/dlls/winex11.drv/window.c
+@@ -2712,8 +2712,9 @@ LRESULT CDECL X11DRV_WindowMessage( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
+     case WM_X11DRV_SET_CURSOR:
+         if ((data = get_win_data( hwnd )))
+         {
+-            if (data->whole_window) set_window_cursor( data->whole_window, (HCURSOR)lp );
++            Window win = data->whole_window;
+             release_win_data( data );
++            if (win) set_window_cursor( win, (HCURSOR)lp );
+         }
+         else if (hwnd == x11drv_thread_data()->clip_hwnd)
+             set_window_cursor( x11drv_thread_data()->clip_window, (HCURSOR)lp );
+-- 
+2.20.1
+

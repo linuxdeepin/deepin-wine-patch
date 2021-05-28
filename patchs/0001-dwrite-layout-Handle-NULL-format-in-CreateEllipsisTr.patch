@@ -1,0 +1,47 @@
+From b5dbd180b49003adb6483084520f1e09c09c7de4 Mon Sep 17 00:00:00 2001
+From: Haoyang Chen <chenhaoyang@uniontech.com>
+Date: Mon, 18 Jan 2021 15:38:40 +0300
+Subject: [PATCH] dwrite/layout: Handle NULL format in
+ CreateEllipsisTrimmingSign().
+
+Signed-off-by: Nikolay Sivov <nsivov@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/dwrite/layout.c       | 3 +++
+ dlls/dwrite/tests/layout.c | 5 +++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/dlls/dwrite/layout.c b/dlls/dwrite/layout.c
+index 1f6201a6a93..58aa05abd44 100644
+--- a/dlls/dwrite/layout.c
++++ b/dlls/dwrite/layout.c
+@@ -5361,6 +5361,9 @@ HRESULT create_trimmingsign(IDWriteFactory7 *factory, IDWriteTextFormat *format,
+ 
+     *sign = NULL;
+ 
++    if (!format)
++        return E_INVALIDARG;
++
+     /* Validate reading/flow direction here, layout creation won't complain about
+        invalid combinations. */
+     reading = IDWriteTextFormat_GetReadingDirection(format);
+diff --git a/dlls/dwrite/tests/layout.c b/dlls/dwrite/tests/layout.c
+index beb09f400f9..7d950a0626c 100644
+--- a/dlls/dwrite/tests/layout.c
++++ b/dlls/dwrite/tests/layout.c
+@@ -1321,6 +1321,11 @@ static void test_CreateEllipsisTrimmingSign(void)
+             DWRITE_FONT_STRETCH_NORMAL, 10.0f, L"en-GB", &format);
+     ok(hr == S_OK, "Failed to create text format, hr %#x.\n", hr);
+ 
++    sign = (void *)0xdeadbeef;
++    hr = IDWriteFactory_CreateEllipsisTrimmingSign(factory, NULL, &sign);
++    ok(hr == E_INVALIDARG, "Unexpected hr %#x.\n", hr);
++    ok(!sign, "Unexpected pointer %p.\n", sign);
++
+     EXPECT_REF(format, 1);
+     hr = IDWriteFactory_CreateEllipsisTrimmingSign(factory, format, &sign);
+     ok(hr == S_OK, "got 0x%08x\n", hr);
+-- 
+2.20.1
+

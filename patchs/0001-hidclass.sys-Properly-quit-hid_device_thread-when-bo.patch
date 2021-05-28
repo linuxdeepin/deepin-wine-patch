@@ -1,0 +1,57 @@
+From 3f2055b1cf47812dc3453d69d420d3f9481efe74 Mon Sep 17 00:00:00 2001
+From: Changhui Liu <liuchanghui@linuxdeepin.com>
+Date: Wed, 20 Jan 2016 14:11:42 +0800
+Subject: [PATCH] hidclass.sys: Properly quit hid_device_thread when both
+ completion event and halt event are signaled.
+
+Signed-off-by: Changhui Liu <liuchanghui@linuxdeepin.com>
+Signed-off-by: Aric Stewart <aric@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/hidclass.sys/device.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/dlls/hidclass.sys/device.c b/dlls/hidclass.sys/device.c
+index 41b54050c24..886a77a3e5b 100644
+--- a/dlls/hidclass.sys/device.c
++++ b/dlls/hidclass.sys/device.c
+@@ -261,7 +261,7 @@ static DWORD CALLBACK hid_device_thread(void *args)
+     NTSTATUS ntrc;
+ 
+     BASE_DEVICE_EXTENSION *ext = device->DeviceExtension;
+-    events[0] = CreateEventA(NULL, FALSE, FALSE, NULL);
++    events[0] = CreateEventA(NULL, TRUE, FALSE, NULL);
+     events[1] = ext->halt_event;
+ 
+     if (ext->information.Polled)
+@@ -336,12 +336,13 @@ static DWORD CALLBACK hid_device_thread(void *args)
+ 
+             if (ntrc == STATUS_PENDING)
+             {
+-                rc = WaitForMultipleObjects(2, events, FALSE, INFINITE);
+-
+-                if (rc == WAIT_OBJECT_0 + 1)
+-                    exit_now = TRUE;
++                WaitForMultipleObjects(2, events, FALSE, INFINITE);
+             }
+ 
++            rc = WaitForSingleObject(ext->halt_event, 0);
++            if (rc == WAIT_OBJECT_0)
++                exit_now = TRUE;
++
+             if (!exit_now && irp->IoStatus.u.Status == STATUS_SUCCESS)
+             {
+                 packet->reportId = buffer[0];
+@@ -368,7 +369,7 @@ static DWORD CALLBACK hid_device_thread(void *args)
+ void HID_StartDeviceThread(DEVICE_OBJECT *device)
+ {
+     BASE_DEVICE_EXTENSION *ext = device->DeviceExtension;
+-    ext->halt_event = CreateEventA(NULL, FALSE, FALSE, NULL);
++    ext->halt_event = CreateEventA(NULL, TRUE, FALSE, NULL);
+     ext->thread = CreateThread(NULL, 0, hid_device_thread, device, 0, NULL);
+ }
+ 
+-- 
+2.20.1
+

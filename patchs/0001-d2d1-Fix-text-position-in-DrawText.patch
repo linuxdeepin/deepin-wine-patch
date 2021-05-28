@@ -1,0 +1,29 @@
+From f37c83452ebd909275b896bdc37f36155e1800ee Mon Sep 17 00:00:00 2001
+From: Haoyang Chen <chenhaoyang@uniontech.com>
+Date: Tue, 19 Jan 2021 15:48:15 +0300
+Subject: [PATCH] d2d1: Fix text position in DrawText().
+
+Signed-off-by: Nikolay Sivov <nsivov@codeweavers.com>
+Signed-off-by: Henri Verbeet <hverbeet@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/d2d1/device.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dlls/d2d1/device.c b/dlls/d2d1/device.c
+index 5f04c3aa833..bd3af3d16ff 100644
+--- a/dlls/d2d1/device.c
++++ b/dlls/d2d1/device.c
+@@ -1189,7 +1189,7 @@ static void STDMETHODCALLTYPE d2d_device_context_DrawText(ID2D1DeviceContext *if
+         return;
+     }
+ 
+-    d2d_point_set(&origin, layout_rect->left, layout_rect->top);
++    d2d_point_set(&origin, min(layout_rect->left, layout_rect->right), min(layout_rect->top, layout_rect->bottom));
+     ID2D1DeviceContext_DrawTextLayout(iface, origin, text_layout, brush, options);
+     IDWriteTextLayout_Release(text_layout);
+ }
+-- 
+2.20.1
+

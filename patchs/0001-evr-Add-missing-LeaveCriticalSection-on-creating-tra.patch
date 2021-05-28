@@ -1,0 +1,29 @@
+From 1647524ba08974d512c5d6d69f2ff10028bc1440 Mon Sep 17 00:00:00 2001
+From: Haidong Yu <yuhaidong@uniontech.com>
+Date: Fri, 11 Dec 2020 10:21:22 +0800
+Subject: [PATCH] evr: Add missing LeaveCriticalSection on creating tracking
+ thread.
+
+Signed-off-by: yuhaidong <yuhaidong@uniontech.com>
+Signed-off-by: Nikolay Sivov <nsivov@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/evr/sample.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/dlls/evr/sample.c b/dlls/evr/sample.c
+index aedf19b9fd4..44b09d6d474 100644
+--- a/dlls/evr/sample.c
++++ b/dlls/evr/sample.c
+@@ -345,6 +345,7 @@ static void video_sample_create_tracking_thread(void)
+         {
+             WARN("Failed to create sample tracking thread.\n");
+             CloseHandle(ready_event);
++            LeaveCriticalSection(&tracking_thread_cs);
+             return;
+         }
+ 
+-- 
+2.20.1
+

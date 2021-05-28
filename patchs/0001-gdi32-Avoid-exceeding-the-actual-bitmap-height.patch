@@ -1,0 +1,32 @@
+From abd0cddc5fbf45736b5846affb12e299f5f3e99f Mon Sep 17 00:00:00 2001
+From: Haoyang Chen <chenhaoyang@uniontech.com>
+Date: Thu, 12 Nov 2020 10:38:15 +0000
+Subject: [PATCH] gdi32: Avoid exceeding the actual bitmap height.
+
+The bottom-up case is handled earlier on.  For the top-down
+case, 'lines' is left untouched.
+
+Signed-off-by: Haoyang Chen <chenhaoyang@uniontech.com>
+Signed-off-by: Huw Davies <huw@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/gdi32/dib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dlls/gdi32/dib.c b/dlls/gdi32/dib.c
+index 10a7a957973..790ecf06501 100644
+--- a/dlls/gdi32/dib.c
++++ b/dlls/gdi32/dib.c
+@@ -824,7 +824,7 @@ INT CDECL nulldrv_SetDIBitsToDevice( PHYSDEV dev, INT x_dst, INT y_dst, DWORD cx
+             }
+             else if (src.y >= lines) return lines;
+         }
+-        src_info->bmiHeader.biHeight = top_down ? -lines : lines;
++        src_info->bmiHeader.biHeight = top_down ? -min( lines, height ) : lines;
+         src_info->bmiHeader.biSizeImage = get_dib_image_size( src_info );
+     }
+ 
+-- 
+2.20.1
+

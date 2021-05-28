@@ -1,0 +1,70 @@
+From f6ae4d167048fcd121475fe25031194fc3f19dc3 Mon Sep 17 00:00:00 2001
+From: Jiangyi Chen <chenjiangyi@uniontech.com>
+Date: Tue, 22 Sep 2020 10:18:27 +0000
+Subject: [PATCH] iphlpapi: Rename local variables shadowing the flags
+ parameters.
+
+Signed-off-by: Jiangyi Chen <chenjiangyi@uniontech.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/iphlpapi/ipstats.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/dlls/iphlpapi/ipstats.c b/dlls/iphlpapi/ipstats.c
+index d8c2ce029b4..0fa446c21a5 100644
+--- a/dlls/iphlpapi/ipstats.c
++++ b/dlls/iphlpapi/ipstats.c
+@@ -1402,7 +1402,7 @@ DWORD WINAPI AllocateAndGetIpForwardTableFromStack(PMIB_IPFORWARDTABLE *ppIpForw
+         if ((fp = fopen("/proc/net/route", "r")))
+         {
+             char buf[512], *ptr;
+-            DWORD flags;
++            DWORD rtf_flags;
+ 
+             /* skip header line */
+             ptr = fgets(buf, sizeof(buf), fp);
+@@ -1417,10 +1417,10 @@ DWORD WINAPI AllocateAndGetIpForwardTableFromStack(PMIB_IPFORWARDTABLE *ppIpForw
+ 
+                 row.dwForwardDest = strtoul(ptr, &ptr, 16);
+                 row.dwForwardNextHop = strtoul(ptr + 1, &ptr, 16);
+-                flags = strtoul(ptr + 1, &ptr, 16);
++                rtf_flags = strtoul(ptr + 1, &ptr, 16);
+ 
+-                if (!(flags & RTF_UP)) row.u1.ForwardType = MIB_IPROUTE_TYPE_INVALID;
+-                else if (flags & RTF_GATEWAY) row.u1.ForwardType = MIB_IPROUTE_TYPE_INDIRECT;
++                if (!(rtf_flags & RTF_UP)) row.u1.ForwardType = MIB_IPROUTE_TYPE_INVALID;
++                else if (rtf_flags & RTF_GATEWAY) row.u1.ForwardType = MIB_IPROUTE_TYPE_INDIRECT;
+                 else row.u1.ForwardType = MIB_IPROUTE_TYPE_DIRECT;
+ 
+                 strtoul(ptr + 1, &ptr, 16); /* refcount, skip */
+@@ -1664,7 +1664,7 @@ DWORD WINAPI AllocateAndGetIpNetTableFromStack(PMIB_IPNETTABLE *ppIpNetTable, BO
+         if ((fp = fopen("/proc/net/arp", "r")))
+         {
+             char buf[512], *ptr;
+-            DWORD flags;
++            DWORD atf_flags;
+ 
+             /* skip header line */
+             ptr = fgets(buf, sizeof(buf), fp);
+@@ -1675,14 +1675,14 @@ DWORD WINAPI AllocateAndGetIpNetTableFromStack(PMIB_IPNETTABLE *ppIpNetTable, BO
+                 row.dwAddr = inet_addr(ptr);
+                 while (*ptr && !isspace(*ptr)) ptr++;
+                 strtoul(ptr + 1, &ptr, 16); /* hw type (skip) */
+-                flags = strtoul(ptr + 1, &ptr, 16);
++                atf_flags = strtoul(ptr + 1, &ptr, 16);
+ 
+ #ifdef ATF_COM
+-                if (flags & ATF_COM) row.u.Type = MIB_IPNET_TYPE_DYNAMIC;
++                if (atf_flags & ATF_COM) row.u.Type = MIB_IPNET_TYPE_DYNAMIC;
+                 else
+ #endif
+ #ifdef ATF_PERM
+-                if (flags & ATF_PERM) row.u.Type = MIB_IPNET_TYPE_STATIC;
++                if (atf_flags & ATF_PERM) row.u.Type = MIB_IPNET_TYPE_STATIC;
+                 else
+ #endif
+                     row.u.Type = MIB_IPNET_TYPE_OTHER;
+-- 
+2.20.1
+

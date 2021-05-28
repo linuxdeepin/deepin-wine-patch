@@ -1,0 +1,24 @@
+From e48c3e466cb49e556db44725be19aabc58b9ce26 Mon Sep 17 00:00:00 2001
+From: Hao Peng <penghao@linuxdeepin.com>
+Date: Wed, 22 Jul 2015 09:38:42 +0800
+Subject: [PATCH] regsvr32: Change regsvr32 to a GUI program.
+
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ programs/regsvr32/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/programs/regsvr32/Makefile.in b/programs/regsvr32/Makefile.in
+index b99db287e8c..15646a6b7ec 100644
+--- a/programs/regsvr32/Makefile.in
++++ b/programs/regsvr32/Makefile.in
+@@ -1,5 +1,5 @@
+ MODULE    = regsvr32.exe
+-APPMODE   = -mconsole -municode
++APPMODE   = -mwindows -municode
+ IMPORTS   = ole32 user32
+ 
+ C_SRCS = \
+-- 
+2.20.1
+

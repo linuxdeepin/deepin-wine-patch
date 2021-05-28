@@ -1,0 +1,53 @@
+From d5d4c19226273efe1ce1a11782bfbd70e58a70d3 Mon Sep 17 00:00:00 2001
+From: Hao Peng <penghao@linuxdeepin.com>
+Date: Thu, 22 Jan 2015 15:51:40 +0800
+Subject: [PATCH] wbemprox: Implement Win32_BaseBoard.Version.
+
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/wbemprox/builtin.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/dlls/wbemprox/builtin.c b/dlls/wbemprox/builtin.c
+index 922f6c59de9..7c22ad884b8 100644
+--- a/dlls/wbemprox/builtin.c
++++ b/dlls/wbemprox/builtin.c
+@@ -311,7 +311,8 @@ static const struct column col_baseboard[] =
+     { prop_nameW,          CIM_STRING },
+     { prop_productW,       CIM_STRING },
+     { prop_serialnumberW,  CIM_STRING },
+-    { prop_tagW,           CIM_STRING|COL_FLAG_KEY }
++    { prop_tagW,           CIM_STRING|COL_FLAG_KEY },
++    { prop_versionW,       CIM_STRING }
+ };
+ static const struct column col_bios[] =
+ {
+@@ -552,6 +553,8 @@ static const WCHAR baseboard_serialnumberW[] =
+     {'N','o','n','e',0};
+ static const WCHAR baseboard_tagW[] =
+     {'B','a','s','e',' ','B','o','a','r','d',0};
++static const WCHAR baseboard_versionW[] =
++    {'1','.','0',0};
+ static const WCHAR bios_descriptionW[] =
+     {'D','e','f','a','u','l','t',' ','S','y','s','t','e','m',' ','B','I','O','S',0};
+ static const WCHAR bios_manufacturerW[] =
+@@ -644,6 +647,7 @@ struct record_baseboard
+     const WCHAR *product;
+     const WCHAR *serialnumber;
+     const WCHAR *tag;
++    const WCHAR *version;
+ };
+ struct record_bios
+ {
+@@ -881,7 +885,7 @@ struct record_videocontroller
+ 
+ static const struct record_baseboard data_baseboard[] =
+ {
+-    { baseboard_manufacturerW, baseboard_tagW, baseboard_tagW, baseboard_tagW, baseboard_serialnumberW, baseboard_tagW }
++    { baseboard_manufacturerW, baseboard_tagW, baseboard_tagW, baseboard_tagW, baseboard_serialnumberW, baseboard_versionW }
+ };
+ static const struct record_bios data_bios[] =
+ {
+-- 
+2.20.1
+

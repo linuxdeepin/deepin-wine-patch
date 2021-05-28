@@ -1,0 +1,27 @@
+From 655ab7a84f1442ebc185a09acd06611cac1a3eb2 Mon Sep 17 00:00:00 2001
+From: Chao Long <longchao@uniontech.com>
+Date: Thu, 10 Sep 2020 11:09:34 +0800
+Subject: [PATCH] ntdll: Fix a ImagePathName memory leak (Valgrind).
+
+Signed-off-by: Chao Long <longchao@uniontech.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/ntdll/env.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/dlls/ntdll/env.c b/dlls/ntdll/env.c
+index 06e7c1bb372..933792317da 100644
+--- a/dlls/ntdll/env.c
++++ b/dlls/ntdll/env.c
+@@ -1250,6 +1250,7 @@ void init_user_process_params(void)
+ 
+         params->Environment = env;
+         NtCurrentTeb()->Peb->ProcessParameters = params;
++        RtlFreeUnicodeString( &initial_params.ImagePathName );
+         RtlFreeUnicodeString( &cmdline );
+         RtlReleasePath( load_path );
+ 
+-- 
+2.20.1
+

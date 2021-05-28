@@ -1,0 +1,105 @@
+From c82c71be649ed155a66d4e5f5579b77442c58354 Mon Sep 17 00:00:00 2001
+From: Zhipeng Zhao <zhaozhipeng@uniontech.com>
+Date: Fri, 5 Jun 2020 01:34:18 -0700
+Subject: [PATCH] wlanapi: Add WlanQueryInterface stub implementation.
+
+Signed-off-by: Zhipeng Zhao <zhaozhipeng@uniontech.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/wlanapi/main.c       |  8 ++++++++
+ dlls/wlanapi/wlanapi.spec |  2 +-
+ include/wlanapi.h         | 39 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 48 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/wlanapi/main.c b/dlls/wlanapi/main.c
+index 5ec0e0bf841..cfffeedb110 100644
+--- a/dlls/wlanapi/main.c
++++ b/dlls/wlanapi/main.c
+@@ -164,6 +164,14 @@ DWORD WINAPI WlanGetAvailableNetworkList(HANDLE handle, const GUID *guid, DWORD
+     return ERROR_CALL_NOT_IMPLEMENTED;
+ }
+ 
++DWORD WINAPI WlanQueryInterface(HANDLE handle, const GUID *guid, WLAN_INTF_OPCODE opcode,
++                    void *reserved, DWORD *data_size, void **data, WLAN_OPCODE_VALUE_TYPE *opcode_type)
++{
++    FIXME("(%p, %s, 0x%x, %p, %p, %p, %p) stub\n",
++          handle, wine_dbgstr_guid(guid), opcode, reserved, data_size, data, opcode_type);
++
++    return ERROR_CALL_NOT_IMPLEMENTED;
++}
+ void WINAPI WlanFreeMemory(void *ptr)
+ {
+     TRACE("(%p)\n", ptr);
+diff --git a/dlls/wlanapi/wlanapi.spec b/dlls/wlanapi/wlanapi.spec
+index dc1b9078092..1c21ab5a2ea 100644
+--- a/dlls/wlanapi/wlanapi.spec
++++ b/dlls/wlanapi/wlanapi.spec
+@@ -17,7 +17,7 @@
+ @ stub WlanIhvControl
+ @ stdcall WlanOpenHandle(long ptr ptr ptr)
+ @ stub WlanQueryAutoConfigParameter
+-@ stub WlanQueryInterface
++@ stdcall WlanQueryInterface(ptr ptr long ptr ptr ptr ptr)
+ @ stub WlanReasonCodeToString
+ @ stdcall WlanRegisterNotification(ptr long long ptr ptr ptr ptr)
+ @ stub WlanRenameProfile
+diff --git a/include/wlanapi.h b/include/wlanapi.h
+index 1cd8c93e653..a3288d7778b 100644
+--- a/include/wlanapi.h
++++ b/include/wlanapi.h
+@@ -142,6 +142,44 @@ typedef struct _WLAN_AVAILABLE_NETWORK
+     DWORD dwReserved;
+ } WLAN_AVAILABLE_NETWORK, *PWLAN_AVAILABLE_NETWORK;
+ 
++typedef enum _WLAN_INTF_OPCODE
++{
++    wlan_intf_opcode_autoconf_start = 0x000000000,
++    wlan_intf_opcode_autoconf_enabled,
++    wlan_intf_opcode_background_scan_enabled,
++    wlan_intf_opcode_media_streaming_mode,
++    wlan_intf_opcode_radio_state,
++    wlan_intf_opcode_bss_type,
++    wlan_intf_opcode_interface_state,
++    wlan_intf_opcode_current_connection,
++    wlan_intf_opcode_channel_number,
++    wlan_intf_opcode_supported_infrastructure_auth_cipher_pairs,
++    wlan_intf_opcode_supported_adhoc_auth_cipher_pairs,
++    wlan_intf_opcode_supported_country_or_region_string_list,
++    wlan_intf_opcode_current_operation_mode,
++    wlan_intf_opcode_supported_safe_mode,
++    wlan_intf_opcode_certified_safe_mode,
++    wlan_intf_opcode_hosted_network_capable,
++    wlan_intf_opcode_management_frame_protection_capable,
++    wlan_intf_opcode_autoconf_end = 0x0fffffff,
++    wlan_intf_opcode_msm_start = 0x10000100,
++    wlan_intf_opcode_statistics,
++    wlan_intf_opcode_rssi,
++    wlan_intf_opcode_msm_end = 0x1fffffff,
++    wlan_intf_opcode_security_start = 0x20010000,
++    wlan_intf_opcode_security_end = 0x2fffffff,
++    wlan_intf_opcode_ihv_start = 0x30000000,
++    wlan_intf_opcode_ihv_end = 0x3fffffff
++} WLAN_INTF_OPCODE, *PWLAN_INTF_OPCODE;
++
++typedef enum _WLAN_OPCODE_VALUE_TYPE
++{
++    wlan_opcode_value_type_query_only = 0,
++    wlan_opcode_value_type_set_by_group_policy,
++    wlan_opcode_value_type_set_by_user,
++    wlan_opcode_value_type_invalid
++} WLAN_OPCODE_VALUE_TYPE, *PWLAN_OPCODE_VALUE_TYPE;
++
+ typedef struct _WLAN_AVAILABLE_NETWORK_LIST
+ {
+     DWORD dwNumberOfItems;
+@@ -157,5 +195,6 @@ void WINAPI WlanFreeMemory(void *);
+ DWORD WINAPI WlanScan(HANDLE, const GUID *, const DOT11_SSID *, const WLAN_RAW_DATA *, void *);
+ DWORD WINAPI WlanRegisterNotification(HANDLE, DWORD, BOOL, WLAN_NOTIFICATION_CALLBACK, void *, void *, DWORD *);
+ DWORD WINAPI WlanGetAvailableNetworkList(HANDLE, const GUID *, DWORD, void *, WLAN_AVAILABLE_NETWORK_LIST **);
++DWORD WINAPI WlanQueryInterface(HANDLE, const GUID *, WLAN_INTF_OPCODE, void *, DWORD *, void **, WLAN_OPCODE_VALUE_TYPE *);
+ 
+ #endif /* _WLAN_WLANAPI_H */
+-- 
+2.20.1
+

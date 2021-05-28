@@ -1,0 +1,38 @@
+From 5754bd9c0ae4c74f94b02f242056820a3f483db3 Mon Sep 17 00:00:00 2001
+From: Jiajin Cui <cuijiajin@uniontech.com>
+Date: Thu, 3 Sep 2020 17:17:43 +0800
+Subject: [PATCH] gdiplus: Make gdi_alpha_blend fallback to StretchBlt if
+ current Compositing Mode is SourceCopy.
+
+Signed-off-by: Jiajin Cui <cuijiajin@uniontech.com>
+Signed-off-by: Esme Povirk <esme@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/gdiplus/graphics.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/dlls/gdiplus/graphics.c b/dlls/gdiplus/graphics.c
+index 5db8973c7b6..868aea56422 100644
+--- a/dlls/gdiplus/graphics.c
++++ b/dlls/gdiplus/graphics.c
+@@ -331,8 +331,14 @@ static void round_points(POINT *pti, GpPointF *ptf, INT count)
+ static void gdi_alpha_blend(GpGraphics *graphics, INT dst_x, INT dst_y, INT dst_width, INT dst_height,
+                             HDC hdc, INT src_x, INT src_y, INT src_width, INT src_height)
+ {
+-    if (GetDeviceCaps(graphics->hdc, TECHNOLOGY) == DT_RASPRINTER &&
+-        GetDeviceCaps(graphics->hdc, SHADEBLENDCAPS) == SB_NONE)
++    CompositingMode comp_mode;
++    INT technology = GetDeviceCaps(graphics->hdc, TECHNOLOGY);
++    INT shadeblendcaps  = GetDeviceCaps(graphics->hdc, SHADEBLENDCAPS);
++
++    GdipGetCompositingMode(graphics, &comp_mode);
++
++    if ((technology == DT_RASPRINTER && shadeblendcaps == SB_NONE)
++        || comp_mode == CompositingModeSourceCopy)
+     {
+         TRACE("alpha blending not supported by device, fallback to StretchBlt\n");
+ 
+-- 
+2.20.1
+

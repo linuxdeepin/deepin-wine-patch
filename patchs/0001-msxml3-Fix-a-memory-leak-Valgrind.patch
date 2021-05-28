@@ -1,0 +1,39 @@
+From 9336ec8faf2e2f2420698f40c02988877781bfef Mon Sep 17 00:00:00 2001
+From: Yongjie Yao <yaoyongjie@uniontech.com>
+Date: Fri, 11 Sep 2020 15:41:58 +0000
+Subject: [PATCH] msxml3: Fix a memory leak (Valgrind).
+
+Signed-off-by: Yongjie Yao <yaoyongjie@uniontech.com>
+Signed-off-by: Myah Caron <qsniyg@protonmail.com>
+Signed-off-by: Nikolay Sivov <nsivov@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/msxml3/domdoc.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/dlls/msxml3/domdoc.c b/dlls/msxml3/domdoc.c
+index 8d45c546fb5..d447bd2b1d8 100644
+--- a/dlls/msxml3/domdoc.c
++++ b/dlls/msxml3/domdoc.c
+@@ -797,13 +797,17 @@ static HRESULT domdoc_load_from_stream(domdoc *doc, ISequentialStream *stream)
+ 
+     hr = GetHGlobalFromStream(hstream, &hglobal);
+     if (FAILED(hr))
++    {
++        IStream_Release(hstream);
+         return hr;
++    }
+ 
+     len = GlobalSize(hglobal);
+     ptr = GlobalLock(hglobal);
+     if (len)
+         xmldoc = doparse(doc, ptr, len, XML_CHAR_ENCODING_NONE);
+     GlobalUnlock(hglobal);
++    IStream_Release(hstream);
+ 
+     if (!xmldoc)
+     {
+-- 
+2.20.1
+

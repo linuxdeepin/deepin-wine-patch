@@ -1,0 +1,44 @@
+From f992bc77c87889c37cbd80aced707e6d1a537c8c Mon Sep 17 00:00:00 2001
+From: Jiajin Cui <cuijiajin@uniontech.com>
+Date: Fri, 17 Jul 2020 17:34:09 +0800
+Subject: [PATCH] gdiplus: Fix crash if failed to create bitmap.
+
+Signed-off-by: Jiajin Cui <cuijiajin@uniontech.com>
+Signed-off-by: Esme Povirk <esme@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/gdiplus/graphics.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/gdiplus/graphics.c b/dlls/gdiplus/graphics.c
+index 5194719fd6f..1307bdc1ef6 100644
+--- a/dlls/gdiplus/graphics.c
++++ b/dlls/gdiplus/graphics.c
+@@ -459,6 +459,9 @@ static GpStatus alpha_blend_hdc_pixels(GpGraphics *graphics, INT dst_x, INT dst_
+     hbitmap = CreateDIBSection(hdc, (BITMAPINFO*)&bih, DIB_RGB_COLORS,
+         (void**)&temp_bits, NULL, 0);
+ 
++    if(!hbitmap || !temp_bits)
++        goto done;
++
+     if ((GetDeviceCaps(graphics->hdc, TECHNOLOGY) == DT_RASPRINTER &&
+          GetDeviceCaps(graphics->hdc, SHADEBLENDCAPS) == SB_NONE) ||
+             fmt & PixelFormatPAlpha)
+@@ -470,9 +473,12 @@ static GpStatus alpha_blend_hdc_pixels(GpGraphics *graphics, INT dst_x, INT dst_
+     SelectObject(hdc, hbitmap);
+     gdi_alpha_blend(graphics, dst_x, dst_y, src_width, src_height,
+                     hdc, 0, 0, src_width, src_height);
+-    DeleteDC(hdc);
++
+     DeleteObject(hbitmap);
+ 
++done:
++    DeleteDC(hdc);
++
+     return Ok;
+ }
+ 
+-- 
+2.20.1
+

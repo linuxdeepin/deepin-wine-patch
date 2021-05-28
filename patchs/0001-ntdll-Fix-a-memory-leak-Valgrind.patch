@@ -1,0 +1,32 @@
+From d0946955ec21e4da57aaec92459f81f131b27a49 Mon Sep 17 00:00:00 2001
+From: Chao Long <longchao@uniontech.com>
+Date: Wed, 9 Sep 2020 14:04:39 +0800
+Subject: [PATCH] ntdll: Fix a memory leak (Valgrind).
+
+Signed-off-by: Chao Long <longchao@uniontech.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/ntdll/actctx.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/ntdll/actctx.c b/dlls/ntdll/actctx.c
+index 625cffcca81..7e18544cda8 100644
+--- a/dlls/ntdll/actctx.c
++++ b/dlls/ntdll/actctx.c
+@@ -2265,7 +2265,11 @@ static void parse_dependent_assembly_elem( xmlbuf_t *xmlbuf, struct actctx_loade
+         {
+             parse_assembly_identity_elem(xmlbuf, acl->actctx, &ai, &elem);
+             /* store the newly found identity for later loading */
+-            if (ai.arch && !wcscmp(ai.arch, wildcardW)) ai.arch = strdupW( current_archW );
++            if (ai.arch && !wcscmp(ai.arch, wildcardW))
++            {
++                RtlFreeHeap( GetProcessHeap(), 0, ai.arch );
++                ai.arch = strdupW( current_archW );
++            }
+             TRACE( "adding name=%s version=%s arch=%s\n",
+                    debugstr_w(ai.name), debugstr_version(&ai.version), debugstr_w(ai.arch) );
+             if (!add_dependent_assembly_id(acl, &ai)) set_error( xmlbuf );
+-- 
+2.20.1
+

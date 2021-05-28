@@ -1,0 +1,29 @@
+From 05d9df73d12d202d51b784f1d5eadc55f8448f16 Mon Sep 17 00:00:00 2001
+From: Zhipeng Zhao <zhaozhipeng@uniontech.com>
+Date: Sun, 20 Sep 2020 21:42:09 +0800
+Subject: [PATCH] winex11.drv: If the end of the sequence is '\r\n', there is
+ no need to add extra '\r'.
+
+Signed-off-by: Zhipeng Zhao <zhaozhipeng@uniontech.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/winex11.drv/clipboard.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dlls/winex11.drv/clipboard.c b/dlls/winex11.drv/clipboard.c
+index 8ced781f66c..695c0406a80 100644
+--- a/dlls/winex11.drv/clipboard.c
++++ b/dlls/winex11.drv/clipboard.c
+@@ -673,7 +673,7 @@ static HANDLE unicode_text_from_string( UINT codepage, const void *data, size_t
+     MultiByteToWideChar( codepage, 0, data, size, strW + count, count );
+     for (i = j = 0; i < count; i++)
+     {
+-        if (strW[i + count] == '\n') strW[j++] = '\r';
++        if (strW[i + count] == '\n' && (!i || strW[i + count - 1] != '\r')) strW[j++] = '\r';
+         strW[j++] = strW[i + count];
+     }
+     strW[j++] = 0;
+-- 
+2.20.1
+

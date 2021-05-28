@@ -1,0 +1,39 @@
+From 36e6ea9767473204b0e1635a1d54af3868fa0188 Mon Sep 17 00:00:00 2001
+From: Pengpeng Dong <dongpengpeng@uniontech.com>
+Date: Thu, 10 Sep 2020 11:01:20 +0800
+Subject: [PATCH] gdiplus: Initialize the dead point coordinates in "GpPointF,
+ *ptf" to 0.
+
+Signed-off-by: Pengpeng Dong <dongpengpeng@uniontech.com>
+Signed-off-by: Esme Povirk <esme@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/gdiplus/graphics.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/dlls/gdiplus/graphics.c b/dlls/gdiplus/graphics.c
+index 868aea56422..1615f592d51 100644
+--- a/dlls/gdiplus/graphics.c
++++ b/dlls/gdiplus/graphics.c
+@@ -323,8 +323,15 @@ static void round_points(POINT *pti, GpPointF *ptf, INT count)
+     int i;
+ 
+     for(i = 0; i < count; i++){
+-        pti[i].x = gdip_round(ptf[i].X);
+-        pti[i].y = gdip_round(ptf[i].Y);
++        if(isnan(ptf[i].X))
++            pti[i].x = 0;
++        else
++            pti[i].x = gdip_round(ptf[i].X);
++
++        if(isnan(ptf[i].Y))
++            pti[i].y = 0;
++        else
++            pti[i].y = gdip_round(ptf[i].Y);
+     }
+ }
+ 
+-- 
+2.20.1
+

@@ -1,0 +1,47 @@
+From 331092b54e26e680c13b9c7d5e6b120e4c62d49e Mon Sep 17 00:00:00 2001
+From: Hao Peng <penghao@linuxdeepin.com>
+Date: Thu, 31 Jul 2014 15:26:58 +0800
+Subject: [PATCH] iphlpapi: Add PfBindInterfaceToIPAddress function stub.
+
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/iphlpapi/iphlpapi.spec   | 2 +-
+ dlls/iphlpapi/iphlpapi_main.c | 9 +++++++++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/iphlpapi/iphlpapi.spec b/dlls/iphlpapi/iphlpapi.spec
+index 36ba13f390c..655fda1cf80 100644
+--- a/dlls/iphlpapi/iphlpapi.spec
++++ b/dlls/iphlpapi/iphlpapi.spec
+@@ -245,7 +245,7 @@
+ #@ stub ParseNetworkString
+ @ stub _PfAddFiltersToInterface@24
+ @ stub _PfAddGlobalFilterToInterface@8
+-@ stub _PfBindInterfaceToIPAddress@12
++@ stdcall _PfBindInterfaceToIPAddress@12(long long ptr) PfBindInterfaceToIPAddress
+ @ stub _PfBindInterfaceToIndex@16
+ @ stdcall _PfCreateInterface@24(long long long long long ptr) PfCreateInterface
+ @ stub _PfDeleteInterface@4
+diff --git a/dlls/iphlpapi/iphlpapi_main.c b/dlls/iphlpapi/iphlpapi_main.c
+index 70a063b32c6..8d8c39cb222 100644
+--- a/dlls/iphlpapi/iphlpapi_main.c
++++ b/dlls/iphlpapi/iphlpapi_main.c
+@@ -2510,6 +2510,15 @@ DWORD WINAPI PfCreateInterface(DWORD dwName, PFFORWARD_ACTION inAction, PFFORWAR
+     return ERROR_CALL_NOT_IMPLEMENTED;
+ }
+ 
++/******************************************************************
++ *   PfBindInterfaceToIPAddress(IPHLPAPI.@)
++ */
++DWORD WINAPI PfBindInterfaceToIPAddress(INTERFACE_HANDLE interface, PFADDRESSTYPE type, PBYTE ip)
++{
++    FIXME("(%p %d %p) stub\n", interface, type, ip);
++    return ERROR_CALL_NOT_IMPLEMENTED;
++}
++
+ /******************************************************************
+  *    GetTcpTable2 (IPHLPAPI.@)
+  */
+-- 
+2.20.1
+

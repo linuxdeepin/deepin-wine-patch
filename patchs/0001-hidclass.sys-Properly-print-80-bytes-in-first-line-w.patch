@@ -1,0 +1,30 @@
+From 0125ef6dd757b2be8295e0f10f4f0e0657a5486a Mon Sep 17 00:00:00 2001
+From: Changhui Liu <liuchanghui@linuxdeepin.com>
+Date: Fri, 18 Dec 2015 14:48:56 +0800
+Subject: [PATCH] hidclass.sys: Properly print 80 bytes in first line when
+ tracing ParseDescriptor.
+
+Signed-off-by: Changhui Liu <liuchanghui@linuxdeepin.com>
+Signed-off-by: Aric Stewart <aric@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/hidclass.sys/descriptor.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dlls/hidclass.sys/descriptor.c b/dlls/hidclass.sys/descriptor.c
+index eb0b42a05ba..9a26f0f4d5b 100644
+--- a/dlls/hidclass.sys/descriptor.c
++++ b/dlls/hidclass.sys/descriptor.c
+@@ -1030,7 +1030,7 @@ WINE_HIDP_PREPARSED_DATA* ParseDescriptor(BYTE *descriptor, unsigned int length)
+         for (cidx = 0; cidx < length; cidx++)
+         {
+             TRACE("%x ",descriptor[cidx]);
+-            if (cidx % 80 == 0)
++            if ((cidx+1) % 80 == 0)
+                 TRACE("\n");
+         }
+         TRACE("\n");
+-- 
+2.20.1
+

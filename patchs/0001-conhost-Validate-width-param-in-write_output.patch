@@ -1,0 +1,29 @@
+From b9f1ec8c44ebe62b4005d4ea2cfd63f700ea8a17 Mon Sep 17 00:00:00 2001
+From: Pengpeng Dong <dongpengpeng@uniontech.com>
+Date: Wed, 23 Sep 2020 15:04:39 +0200
+Subject: [PATCH] conhost: Validate width param in write_output.
+
+Signed-off-by: Pengpeng Dong <dongpengpeng@uniontech.com>
+Signed-off-by: Jacek Caban <jacek@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ programs/conhost/conhost.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/programs/conhost/conhost.c b/programs/conhost/conhost.c
+index 79cbb8e83a4..ed528385286 100644
+--- a/programs/conhost/conhost.c
++++ b/programs/conhost/conhost.c
+@@ -1984,6 +1984,8 @@ static NTSTATUS write_output( struct screen_buffer *screen_buffer, const struct
+     char_info_t *dest;
+     char *src;
+ 
++    if (*out_size == sizeof(SMALL_RECT) && !params->width) return STATUS_INVALID_PARAMETER;
++
+     entry_size = params->mode == CHAR_INFO_MODE_TEXTATTR ? sizeof(char_info_t) : sizeof(WCHAR);
+     entry_cnt = (in_size - sizeof(*params)) / entry_size;
+ 
+-- 
+2.20.1
+

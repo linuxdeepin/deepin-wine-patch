@@ -1,0 +1,27 @@
+From 0af8e8123824e551b2eec27e5a6898b2c21939c6 Mon Sep 17 00:00:00 2001
+From: Hao Peng <penghao@linuxdeepin.com>
+Date: Wed, 17 Sep 2014 17:39:40 +0800
+Subject: [PATCH] svchost: Add LOAD_WITH_ALTERED_SEARCH_PATH flag when loading
+ the dll.
+
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ programs/svchost/svchost.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/programs/svchost/svchost.c b/programs/svchost/svchost.c
+index 8713b4a8acc..704510407ca 100644
+--- a/programs/svchost/svchost.c
++++ b/programs/svchost/svchost.c
+@@ -204,7 +204,7 @@ static BOOL AddServiceElem(LPWSTR service_name,
+     RegCloseKey(service_hkey);
+ 
+     /* Load the DLL and obtain a pointer to ServiceMain entry point */
+-    library = LoadLibraryW(dll_name_long);
++    library = LoadLibraryExW(dll_name_long, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+     if (!library)
+     {
+         WINE_ERR("failed to load library %s, err=%u\n",
+-- 
+2.20.1
+

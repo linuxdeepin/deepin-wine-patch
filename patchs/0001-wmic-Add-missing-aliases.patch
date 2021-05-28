@@ -1,0 +1,32 @@
+From 7dba53a0f28f1a30c538744f4d76cdddacc6c8af Mon Sep 17 00:00:00 2001
+From: Chao Long <longchao@uniontech.com>
+Date: Mon, 8 Mar 2021 09:25:42 +0100
+Subject: [PATCH] wmic: Add missing aliases.
+
+Signed-off-by: Chao Long <longchao@uniontech.com>
+Signed-off-by: Hans Leidekker <hans@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ programs/wmic/main.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/programs/wmic/main.c b/programs/wmic/main.c
+index 1372c0986e9..f0b6ea0f05d 100644
+--- a/programs/wmic/main.c
++++ b/programs/wmic/main.c
+@@ -44,7 +44,10 @@ alias_map[] =
+     { L"LogicalDisk", L"Win32_LogicalDisk" },
+     { L"nic", L"Win32_NetworkAdapter" },
+     { L"os", L"Win32_OperatingSystem" },
+-    { L"process", L"Win32_Process" }
++    { L"process", L"Win32_Process" },
++    { L"baseboard", L"Win32_BaseBoard" },
++    { L"diskdrive", L"Win32_DiskDrive" },
++    { L"memorychip", L"Win32_PhysicalMemory" }
+ };
+ 
+ static const WCHAR *find_class( const WCHAR *alias )
+-- 
+2.20.1
+

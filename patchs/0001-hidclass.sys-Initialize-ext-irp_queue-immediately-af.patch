@@ -1,0 +1,47 @@
+From acdd869e5d2b2fa01c60eddab7445b71ac21881a Mon Sep 17 00:00:00 2001
+From: Changhui Liu <liuchanghui@linuxdeepin.com>
+Date: Fri, 18 Dec 2015 14:40:16 +0800
+Subject: [PATCH] hidclass.sys: Initialize ext->irp_queue immediately after
+ HID_CreateDevice.
+
+Signed-off-by: Changhui Liu <liuchanghui@linuxdeepin.com>
+Signed-off-by: Aric Stewart <aric@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/hidclass.sys/pnp.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/dlls/hidclass.sys/pnp.c b/dlls/hidclass.sys/pnp.c
+index 1ae3bb0e842..24dd14024d7 100644
+--- a/dlls/hidclass.sys/pnp.c
++++ b/dlls/hidclass.sys/pnp.c
+@@ -132,6 +132,9 @@ NTSTATUS WINAPI PNP_AddDevice(DRIVER_OBJECT *driver, DEVICE_OBJECT *PDO)
+         return status;
+     }
+ 
++    ext = device->DeviceExtension;
++    InitializeListHead(&ext->irp_queue);
++
+     TRACE("Created device %p\n",device);
+     status = minidriver->AddDevice(minidriver->minidriver.DriverObject, device);
+     if (status != STATUS_SUCCESS)
+@@ -160,7 +163,6 @@ NTSTATUS WINAPI PNP_AddDevice(DRIVER_OBJECT *driver, DEVICE_OBJECT *PDO)
+         return status;
+     }
+ 
+-    ext = device->DeviceExtension;
+     ext->information.VendorID = attr.VendorID;
+     ext->information.ProductID = attr.ProductID;
+     ext->information.VersionNumber = attr.VersionNumber;
+@@ -233,7 +235,6 @@ NTSTATUS WINAPI PNP_AddDevice(DRIVER_OBJECT *driver, DEVICE_OBJECT *PDO)
+     HID_LinkDevice(device, serial, interface);
+ 
+     ext->poll_interval = DEFAULT_POLL_INTERVAL;
+-    InitializeListHead(&ext->irp_queue);
+ 
+     ext->ring_buffer = RingBuffer_Create(sizeof(HID_XFER_PACKET) + ext->preparseData->caps.InputReportByteLength);
+ 
+-- 
+2.20.1
+

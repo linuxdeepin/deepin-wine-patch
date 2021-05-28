@@ -1,0 +1,45 @@
+From 16b8f2b3e75241394ff552b9aeadd7823fad6391 Mon Sep 17 00:00:00 2001
+From: Haoyang Chen <chenhaoyang@uniontech.com>
+Date: Thu, 22 Oct 2020 11:25:36 +0200
+Subject: [PATCH] wbemprox: Implement Win32_SoundDevice.Status.
+
+Signed-off-by: Haoyang Chen <chenhaoyang@uniontech.com>
+Signed-off-by: Hans Leidekker <hans@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/wbemprox/builtin.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/wbemprox/builtin.c b/dlls/wbemprox/builtin.c
+index 590714b826b..e35aa069e1d 100644
+--- a/dlls/wbemprox/builtin.c
++++ b/dlls/wbemprox/builtin.c
+@@ -379,6 +379,7 @@ static const struct column col_sounddevice[] =
+     { L"Manufacturer", CIM_STRING },
+     { L"Name",         CIM_STRING },
+     { L"ProductName",  CIM_STRING },
++    { L"Status",       CIM_STRING },
+     { L"StatusInfo",   CIM_UINT16 },
+ };
+ static const struct column col_stdregprov[] =
+@@ -768,6 +769,7 @@ struct record_sounddevice
+     const WCHAR *manufacturer;
+     const WCHAR *name;
+     const WCHAR *productname;
++    const WCHAR *status;
+     UINT16       statusinfo;
+ };
+ struct record_stdregprov
+@@ -886,7 +888,7 @@ static const struct record_quickfixengineering data_quickfixengineering[] =
+ };
+ static const struct record_sounddevice data_sounddevice[] =
+ {
+-    { L"The Wine Project", L"Wine Audio Device", L"Wine Audio Device", 3 /* enabled */ }
++    { L"The Wine Project", L"Wine Audio Device", L"Wine Audio Device", L"OK", 3 /* enabled */ }
+ };
+ static const struct record_stdregprov data_stdregprov[] =
+ {
+-- 
+2.20.1
+

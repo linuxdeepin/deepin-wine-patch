@@ -1,0 +1,29 @@
+From 6d6dd78e5dad164d1b313599f9afa5f65481d29d Mon Sep 17 00:00:00 2001
+From: Wei Xie <xiewei@linuxdeepin.com>
+Date: Fri, 19 Jan 2018 15:29:54 +0100
+Subject: [PATCH] wininet: Don't release connection too early.
+
+Signed-off-by: Wei Xie <xiewei@linuxdeepin.com>
+Signed-off-by: Jacek Caban <jacek@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/wininet/http.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dlls/wininet/http.c b/dlls/wininet/http.c
+index b1c2d944ff7..6716c8080ca 100644
+--- a/dlls/wininet/http.c
++++ b/dlls/wininet/http.c
+@@ -5043,7 +5043,7 @@ static DWORD HTTP_HttpSendRequestW(http_request_t *request, LPCWSTR lpszHeaders,
+             res = set_content_length(request);
+             if(res != ERROR_SUCCESS)
+                 goto lend;
+-            if(!request->contentLength)
++            if(!request->contentLength && !secure_proxy_connect)
+                 http_release_netconn(request, TRUE);
+ 
+             if (!(request->hdr.dwFlags & INTERNET_FLAG_NO_AUTO_REDIRECT) && responseLen)
+-- 
+2.20.1
+

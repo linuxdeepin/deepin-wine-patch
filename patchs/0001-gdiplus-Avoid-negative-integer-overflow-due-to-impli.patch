@@ -1,0 +1,33 @@
+From 4c4a5cb799f54326941f5d38eafef908867271dd Mon Sep 17 00:00:00 2001
+From: Haoyang Chen <chenhaoyang@uniontech.com>
+Date: Fri, 29 Jan 2021 18:08:20 +0800
+Subject: [PATCH] gdiplus: Avoid negative integer overflow due to implicit type
+ conversion.
+
+Signed-off-by: Haoyang Chen <chenhaoyang@uniontech.com>
+Signed-off-by: Esme Povirk <esme@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/gdiplus/graphics.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/dlls/gdiplus/graphics.c b/dlls/gdiplus/graphics.c
+index 2e6c0d7c9c8..7b4794e3620 100644
+--- a/dlls/gdiplus/graphics.c
++++ b/dlls/gdiplus/graphics.c
+@@ -972,9 +972,9 @@ static ARGB sample_bitmap_pixel(GDIPCONST GpRect *src_rect, LPBYTE bits, UINT wi
+     {
+         /* Tiling. Make sure co-ordinates are positive as it simplifies the math. */
+         if (x < 0)
+-            x = width*2 + x % (width * 2);
++            x = width*2 + x % (INT)(width * 2);
+         if (y < 0)
+-            y = height*2 + y % (height * 2);
++            y = height*2 + y % (INT)(height * 2);
+ 
+         if (attributes->wrap & WrapModeTileFlipX)
+         {
+-- 
+2.20.1
+

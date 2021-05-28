@@ -1,0 +1,47 @@
+From 240e66a281f9588bc943181d62c96460132f6c74 Mon Sep 17 00:00:00 2001
+From: Hao Peng <penghao@linuxdeepin.com>
+Date: Thu, 31 Jul 2014 15:27:47 +0800
+Subject: [PATCH] iphlpapi: Add PfDeleteInterface function stub.
+
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/iphlpapi/iphlpapi.spec   | 2 +-
+ dlls/iphlpapi/iphlpapi_main.c | 9 +++++++++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/iphlpapi/iphlpapi.spec b/dlls/iphlpapi/iphlpapi.spec
+index 655fda1cf80..1e422f4fb60 100644
+--- a/dlls/iphlpapi/iphlpapi.spec
++++ b/dlls/iphlpapi/iphlpapi.spec
+@@ -248,7 +248,7 @@
+ @ stdcall _PfBindInterfaceToIPAddress@12(long long ptr) PfBindInterfaceToIPAddress
+ @ stub _PfBindInterfaceToIndex@16
+ @ stdcall _PfCreateInterface@24(long long long long long ptr) PfCreateInterface
+-@ stub _PfDeleteInterface@4
++@ stdcall _PfDeleteInterface@4(long) PfDeleteInterface
+ @ stub _PfDeleteLog@0
+ @ stub _PfGetInterfaceStatistics@16
+ @ stub _PfMakeLog@4
+diff --git a/dlls/iphlpapi/iphlpapi_main.c b/dlls/iphlpapi/iphlpapi_main.c
+index 8d8c39cb222..0d9e3716154 100644
+--- a/dlls/iphlpapi/iphlpapi_main.c
++++ b/dlls/iphlpapi/iphlpapi_main.c
+@@ -2510,6 +2510,15 @@ DWORD WINAPI PfCreateInterface(DWORD dwName, PFFORWARD_ACTION inAction, PFFORWAR
+     return ERROR_CALL_NOT_IMPLEMENTED;
+ }
+ 
++/******************************************************************
++ *   PfDeleteInterface(IPHLPAPI.@)
++ */
++DWORD WINAPI PfDeleteInterface(INTERFACE_HANDLE interface)
++{
++    FIXME("(%p) stub\n", interface);
++    return ERROR_CALL_NOT_IMPLEMENTED;
++}
++
+ /******************************************************************
+  *   PfBindInterfaceToIPAddress(IPHLPAPI.@)
+  */
+-- 
+2.20.1
+

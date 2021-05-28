@@ -1,0 +1,46 @@
+From 4765c5ffe2ad42be97ce29e09a6a5c01d5672f60 Mon Sep 17 00:00:00 2001
+From: Pengpeng Dong <dongpengpeng@uniontech.com>
+Date: Wed, 9 Sep 2020 10:07:18 -0500
+Subject: [PATCH] quartz: Return E_POINTER from IVideoWindow::get_Visible() if
+ "visible" is NULL.
+
+Signed-off-by: Pengpeng Dong <dongpengpeng@uniontech.com>
+Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/quartz/tests/videorenderer.c | 3 +++
+ dlls/quartz/window.c              | 3 +++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/dlls/quartz/tests/videorenderer.c b/dlls/quartz/tests/videorenderer.c
+index c2b6271021a..448efe501b6 100644
+--- a/dlls/quartz/tests/videorenderer.c
++++ b/dlls/quartz/tests/videorenderer.c
+@@ -2257,6 +2257,9 @@ static void test_video_window(void)
+     hr = IBaseFilter_QueryInterface(filter, &IID_IVideoWindow, (void **)&window);
+     ok(hr == S_OK, "Got hr %#x.\n", hr);
+ 
++    hr = IVideoWindow_get_Visible(window, NULL);
++    ok(hr == E_POINTER, "Got hr %#x.\n", hr);
++
+     hr = IVideoWindow_get_Caption(window, &caption);
+     todo_wine ok(hr == VFW_E_NOT_CONNECTED, "Got hr %#x.\n", hr);
+ 
+diff --git a/dlls/quartz/window.c b/dlls/quartz/window.c
+index 07e042eccdb..3983d43b08f 100644
+--- a/dlls/quartz/window.c
++++ b/dlls/quartz/window.c
+@@ -334,6 +334,9 @@ HRESULT WINAPI BaseControlWindowImpl_get_Visible(IVideoWindow *iface, LONG *visi
+ 
+     TRACE("window %p, visible %p.\n", window, visible);
+ 
++    if (!visible)
++        return E_POINTER;
++
+     *visible = IsWindowVisible(window->hwnd) ? OATRUE : OAFALSE;
+     return S_OK;
+ }
+-- 
+2.20.1
+

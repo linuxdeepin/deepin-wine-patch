@@ -1,0 +1,74 @@
+From bccd754966437213979d44c57da5bc684872dff8 Mon Sep 17 00:00:00 2001
+From: Haoyang Chen <chenhaoyang@uniontech.com>
+Date: Fri, 18 Sep 2020 10:53:22 +0800
+Subject: [PATCH] gdiplus: Implement GdipEnumerateMetafileSrcRectDestRect.
+
+Signed-off-by: Haoyang Chen <chenhaoyang@uniontech.com>
+Signed-off-by: Esme Povirk <esme@codeweavers.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/gdiplus/gdiplus.spec |  2 +-
+ dlls/gdiplus/metafile.c   | 18 ++++++++++++++++++
+ include/gdiplusflat.h     |  3 +++
+ 3 files changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/dlls/gdiplus/gdiplus.spec b/dlls/gdiplus/gdiplus.spec
+index a722ab7b237..bda8bd56a3f 100644
+--- a/dlls/gdiplus/gdiplus.spec
++++ b/dlls/gdiplus/gdiplus.spec
+@@ -200,7 +200,7 @@
+ 200 stub GdipEnumerateMetafileSrcRectDestPointI
+ 201 stdcall GdipEnumerateMetafileSrcRectDestPoints(ptr ptr ptr long ptr long ptr ptr ptr)
+ 202 stub GdipEnumerateMetafileSrcRectDestPointsI
+-203 stub GdipEnumerateMetafileSrcRectDestRect
++203 stdcall GdipEnumerateMetafileSrcRectDestRect(ptr ptr ptr ptr long ptr ptr ptr)
+ 204 stub GdipEnumerateMetafileSrcRectDestRectI
+ 205 stdcall GdipFillClosedCurve2(ptr ptr ptr long float long)
+ 206 stdcall GdipFillClosedCurve2I(ptr ptr ptr long float long)
+diff --git a/dlls/gdiplus/metafile.c b/dlls/gdiplus/metafile.c
+index 350642e0208..e52932da11a 100644
+--- a/dlls/gdiplus/metafile.c
++++ b/dlls/gdiplus/metafile.c
+@@ -3777,6 +3777,24 @@ GpStatus WINGDIPAPI GdipEnumerateMetafileSrcRectDestPoints(GpGraphics *graphics,
+     return stat;
+ }
+ 
++GpStatus WINGDIPAPI GdipEnumerateMetafileSrcRectDestRect( GpGraphics *graphics,
++        GDIPCONST GpMetafile *metafile, GDIPCONST GpRectF *dest,
++        GDIPCONST GpRectF *src, Unit srcUnit, EnumerateMetafileProc callback,
++        VOID *cb_data, GDIPCONST GpImageAttributes *attrs)
++{
++    GpPointF points[3];
++
++    if (!graphics || !metafile || !dest) return InvalidParameter;
++
++    points[0].X = points[2].X = dest->X;
++    points[0].Y = points[1].Y = dest->Y;
++    points[1].X = dest->X + dest->Width;
++    points[2].Y = dest->Y + dest->Height;
++
++    return GdipEnumerateMetafileSrcRectDestPoints(graphics, metafile, points, 3,
++        src, srcUnit, callback, cb_data, attrs);
++}
++
+ GpStatus WINGDIPAPI GdipEnumerateMetafileDestRect(GpGraphics *graphics,
+     GDIPCONST GpMetafile *metafile, GDIPCONST GpRectF *dest,
+     EnumerateMetafileProc callback, VOID *cb_data, GDIPCONST GpImageAttributes *attrs)
+diff --git a/include/gdiplusflat.h b/include/gdiplusflat.h
+index 1526ce03383..5c9600ed30b 100644
+--- a/include/gdiplusflat.h
++++ b/include/gdiplusflat.h
+@@ -220,6 +220,9 @@ GpStatus WINGDIPAPI GdipEnumerateMetafileDestRectI(GpGraphics*,GDIPCONST GpMetaf
+ GpStatus WINGDIPAPI GdipEnumerateMetafileSrcRectDestPoints(GpGraphics*,
+     GDIPCONST GpMetafile*,GDIPCONST GpPointF*,INT,GDIPCONST GpRectF*,Unit,
+     EnumerateMetafileProc,VOID*,GDIPCONST GpImageAttributes*);
++GpStatus WINGDIPAPI GdipEnumerateMetafileSrcRectDestRect( GpGraphics*, GDIPCONST GpMetafile*,
++    GDIPCONST GpRectF* , GDIPCONST GpRectF*, Unit, EnumerateMetafileProc, VOID*,
++    GDIPCONST GpImageAttributes*);
+ GpStatus WINGDIPAPI GdipFillClosedCurve2(GpGraphics*,GpBrush*,GDIPCONST GpPointF*,INT,
+     REAL,GpFillMode);
+ GpStatus WINGDIPAPI GdipFillClosedCurve2I(GpGraphics*,GpBrush*,GDIPCONST GpPoint*,INT,
+-- 
+2.20.1
+

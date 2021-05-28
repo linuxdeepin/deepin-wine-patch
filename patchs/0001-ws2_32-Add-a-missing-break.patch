@@ -1,0 +1,27 @@
+From 37b7d573b2832c5415220acb2ab33f2c8ab26fc1 Mon Sep 17 00:00:00 2001
+From: Jiangyi Chen <chenjiangyi@uniontech.com>
+Date: Mon, 15 Mar 2021 11:24:02 +0800
+Subject: [PATCH] ws2_32: Add a missing break.
+
+Signed-off-by: Jiangyi Chen <chenjiangyi@uniontech.com>
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+Signed-off-by: Wei Xie <xiewei@deepin.com>
+---
+ dlls/ws2_32/socket.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/dlls/ws2_32/socket.c b/dlls/ws2_32/socket.c
+index 6e783f87ee7..28b14e71c9c 100644
+--- a/dlls/ws2_32/socket.c
++++ b/dlls/ws2_32/socket.c
+@@ -7484,6 +7484,7 @@ SOCKET WINAPI WSASocketW(int af, int type, int protocol,
+             if (!af) af = supported_protocols[i].iAddressFamily;
+             if (!type) type = supported_protocols[i].iSocketType;
+             if (!protocol) protocol = supported_protocols[i].iProtocol;
++            break;
+         }
+     }
+ 
+-- 
+2.20.1
+
